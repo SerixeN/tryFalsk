@@ -1,8 +1,11 @@
-from flask import Flask, render_template, request, redirect, url_for
-from wtforms import DateField, validators, PasswordField, BooleanField, Form
+from flask import Flask, render_template, request, redirect, url_for, flash, session
+from wtforms import DateField, validators, PasswordField, BooleanField, Form, TextField, StringField
+from pymongo import MongoClient
+import gc
+import pprint
 
 app = Flask(__name__)
-
+app.secret_key = 'super secret key'
 
 @app.route('/')
 def main():
@@ -11,15 +14,33 @@ def main():
 
 @app.route('/signup/', methods=["GET", "POST"])
 def signup():
+    client = MongoClient()
+    db = client.flaskProject
     try:
         form = RegistartionForm(request.form)
-
         if request.method == "POST" and form.validate():
             userFirstName = form.userFirstName.data
             userLastName = form.userLastName.data
             userLogin = form.userLogin.data
             userEmail = form.userEmail.data
             userPassword = form.userPassword.data
+
+            if db.Users.find({"userLogin": userLogin}).count() == 1:
+                flash("That login is already taken, please choose another")
+                return render_template("signup.html", form=form)
+            else:
+                result = db.Users.insert_one({
+                    "userFirstName": userFirstName,
+                    "userLastName": userLastName,
+                    "userLogin": userLogin,
+                    "userEmail": userEmail,
+                    "userPassword": userPassword
+                })
+                gc.collect()
+
+                session['logged_in'] = True
+                session['username'] = userLogin
+
             return redirect(url_for('main'))
 
         return render_template('signup.html', form=form)
@@ -31,11 +52,12 @@ def signup():
 def login():
     return render_template('login.html')
 
+
 class RegistartionForm(Form):
-    userFirstName = DateField("First name", [validators.Length(min=4, max=20)])
-    userLastName = DateField("Last name", [validators.Length(min=4, max=20)])
-    userLogin = DateField("Login", [validators.Length(min=6, max=20)])
-    userEmail = DateField("Email", [validators.Length(min=6, max=50)])
+    userFirstName = StringField("First name", [validators.Length(min=4, max=20)])
+    userLastName = StringField("Last name", [validators.Length(min=4, max=20)])
+    userLogin = StringField("Login", [validators.Length(min=6, max=20)])
+    userEmail = StringField("Email", [validators.Length(min=6, max=50)])
     userPassword = PasswordField("New password", [
         validators.DataRequired(),
         validators.EqualTo('confirm', message="Password must match")
@@ -43,5 +65,7 @@ class RegistartionForm(Form):
     confirm = PasswordField('Repeat password')
     accept_tos = BooleanField("I agree with rules.")
 
+
 if __name__ == '__main__':
     app.run(port=app.config.get("PORT", 9000))
+

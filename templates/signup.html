@@ -1,6 +1,19 @@
 {% extends 'header.html' %}
 {% block container %}
+	<div class="container" style="min-height:100% width:80%">
+	{% with messages = get_flashed_messages() %}
+	  {% if messages %}
+	    {% for message in messages %}
+		  <div class="alert alert-warning alert-dismissible" role="alert">
+		  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+			{{message}}
+		  </div>
+		{% endfor %}
+	  {% endif %}
+	{% endwith %}
 
+	{% block body %}{% endblock %}
+	</div>
 <h1>Signup page</h1>
     <br>
     {% from "_formhelpers.html" import render_field %}
@@ -8,6 +21,11 @@
     <dl>
         {{ render_field(form.userFirstName) }}
         {{ render_field(form.userLastName) }}
+        {{ render_field(form.userLogin) }}
+        {{ render_field(form.userEmail) }}
+        {{ render_field(form.userPassword) }}
+        {{ render_field(form.confirm) }}
+        {{ render_field(form.accept_tos) }}
     </dl>
     <p><input type="submit" value="Register"></p>
     </form>
