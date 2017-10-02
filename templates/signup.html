@@ -2,5 +2,18 @@
 {% block container %}
 
 <h1>Signup page</h1>
+    <br>
+    {% from "_formhelpers.html" import render_field %}
+    <form method="post" action="/signup/">
+    <dl>
+        {{ render_field(form.userFirstName) }}
+        {{ render_field(form.userLastName) }}
+    </dl>
+    <p><input type="submit" value="Register"></p>
+    </form>
+
+    {% if error %}
+    <p class="error"><strong>Error:</strong>{{ error }}</p>
+    {% endif %}
 
 {% endblock %}
