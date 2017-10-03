@@ -1,4 +1,14 @@
 {% extends 'header.html' %}
 {% block container %}
 <h1>Login page</h1>
+<form action="/login/" method="post">
+<dl>
+    {% if error %}
+        <h4>{{ error }}</h4>
+    {% endif %}
+    <p><input type="text" placeholder="Login" name="login"></p>
+    <p><input type="password" placeholder="Password" name="password"></p>
+    <p><input type="submit" value="Login"></p>
+</dl>
+</form>
 {% endblock %}

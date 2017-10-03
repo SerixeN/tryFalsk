@@ -7,6 +7,7 @@ import pprint
 app = Flask(__name__)
 app.secret_key = 'super secret key'
 
+
 @app.route('/')
 def main():
     return render_template('main.html')
@@ -48,9 +49,29 @@ def signup():
         return (str(e))
 
 
-@app.route('/login/')
+@app.route('/login/', methods=["GET", "POST"])
 def login():
-    return render_template('login.html')
+    error = ''
+    client = MongoClient()
+    db = client.flaskProject
+    try:
+        if request.method == "POST":
+            if db.Users.find({"userLogin" : request.form["login"],
+                              "userPassword" : request.form["password"]}).count() == 1:
+                session['logged_in'] = True
+                session['username'] = request.form["login"]
+                return redirect(url_for('main'))
+            else:
+                error = "Invalid login or password. Please try again"
+
+        gc.collect()
+
+        return render_template("login.html", error=error)
+
+    except Exception as e:
+        error = "Invalid login or password. Please try again"
+        return render_template("login.html", error=error)
+
 
 
 class RegistartionForm(Form):
