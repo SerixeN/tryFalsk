@@ -1,0 +1,17 @@
+{% extends 'header.html' %}
+{% block container %}
+
+    <form action="/post/" method="post">
+
+    <p>
+        <input type="text" maxlength="20" placeholder="Title">
+    </p>
+    <p>
+        <textarea  cols="100" rows="5"></textarea>
+    </p>
+    <p>
+        <input type="submit" value="Post">
+    </p>
+    </form>
+
+{% endblock %}

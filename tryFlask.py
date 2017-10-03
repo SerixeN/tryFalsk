@@ -83,6 +83,11 @@ def logout():
 def userpage():
     return render_template("userpage.html")
 
+
+@app.route('/post/')
+def post():
+    return render_template("post.html")
+
 class RegistartionForm(Form):
     userFirstName = StringField("First name", [validators.Length(min=4, max=20)])
     userLastName = StringField("Last name", [validators.Length(min=4, max=20)])
