@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
-from wtforms import DateField, validators, PasswordField, BooleanField, Form, TextField, StringField
+from wtforms import validators, PasswordField, BooleanField, Form,  StringField
 from pymongo import MongoClient
 import gc
 
@@ -7,9 +7,13 @@ app = Flask(__name__)
 app.secret_key = 'super secret key'
 
 
-@app.route('/')
+@app.route('/', methods=["GET"])
 def main():
-    return render_template('main.html')
+    try:
+        if session['logged_in']:
+            return render_template('userpage.html')
+    except Exception as e:
+        return render_template('main.html')
 
 
 @app.route('/signup/', methods=["GET", "POST"])
@@ -84,9 +88,21 @@ def userpage():
     return render_template("userpage.html")
 
 
-@app.route('/post/')
+@app.route('/post/', methods=["GET", "POST"])
 def post():
-    return render_template("post.html")
+    client = MongoClient()
+    db = client.flaskProject
+    try:
+        if request.method == "POST":
+            result = db.Posts.insert_one({
+                "userName": session['username'],
+                "title": request.form["title"],
+                "post": request.form["userpost"]
+            })
+            return redirect(url_for('userpage'))
+        return render_template('post.html')
+    except Exception as e:
+        return (str(e))
 
 class RegistartionForm(Form):
     userFirstName = StringField("First name", [validators.Length(min=4, max=20)])
