@@ -72,6 +72,11 @@ def login():
         error = "Invalid login or password. Please try again"
         return render_template("login.html", error=error)
 
+@app.route('/logout/')
+def logout():
+    session.clear()
+    gc.collect()
+    return redirect(url_for('main'))
 
 
 class RegistartionForm(Form):
