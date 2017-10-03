@@ -2,7 +2,6 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from wtforms import DateField, validators, PasswordField, BooleanField, Form, TextField, StringField
 from pymongo import MongoClient
 import gc
-import pprint
 
 app = Flask(__name__)
 app.secret_key = 'super secret key'
@@ -60,7 +59,7 @@ def login():
                               "userPassword" : request.form["password"]}).count() == 1:
                 session['logged_in'] = True
                 session['username'] = request.form["login"]
-                return redirect(url_for('main'))
+                return redirect(url_for('userpage'))
             else:
                 error = "Invalid login or password. Please try again"
 
@@ -72,12 +71,17 @@ def login():
         error = "Invalid login or password. Please try again"
         return render_template("login.html", error=error)
 
+
 @app.route('/logout/')
 def logout():
     session.clear()
     gc.collect()
     return redirect(url_for('main'))
 
+
+@app.route('/userpage/')
+def userpage():
+    return render_template("userpage.html")
 
 class RegistartionForm(Form):
     userFirstName = StringField("First name", [validators.Length(min=4, max=20)])
