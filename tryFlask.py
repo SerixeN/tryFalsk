@@ -1,3 +1,5 @@
+from pprint import pprint
+
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from wtforms import validators, PasswordField, BooleanField, Form,  StringField
 from pymongo import MongoClient
@@ -83,9 +85,16 @@ def logout():
     return redirect(url_for('main'))
 
 
-@app.route('/userpage/')
+@app.route('/userpage/', methods=["GET", "POST"])
 def userpage():
-    return render_template("userpage.html")
+    client = MongoClient()
+    db = client.flasProject
+    try:
+        if request.method == "POST":
+            return redirect(url_for('post'))
+        return render_template("userpage.html")
+    except Exception as e:
+        return (str(e))
 
 
 @app.route('/post/', methods=["GET", "POST"])
@@ -103,6 +112,7 @@ def post():
         return render_template('post.html')
     except Exception as e:
         return (str(e))
+
 
 class RegistartionForm(Form):
     userFirstName = StringField("First name", [validators.Length(min=4, max=20)])

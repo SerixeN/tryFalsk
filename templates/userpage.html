@@ -1,4 +1,9 @@
 {% extends 'header.html' %}
 {% block container %}
 <h1>Welcome {{ session.username }}</h1>
+    <p>
+    <form action="/userpage/" method="post">
+        <input type="submit" value="Make post">
+    </form>
+    </p>
 {% endblock %}
